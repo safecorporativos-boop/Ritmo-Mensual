@@ -3,16 +3,16 @@ const CACHE = 'ritmo-mensual-v1';
 const ASSETS = [
   '/',
   '/index.html',
-  '/src/css/variables.css',
-  '/src/css/base.css',
-  '/src/css/themes.css',
-  '/src/css/layout.css',
-  '/src/css/board.css',
-  '/src/css/components.css',
-  '/src/js/main.js',
-  '/src/js/config.js',
-  '/src/js/storage.js',
-  '/src/js/board.js',
+  '/variables.css',
+  '/base.css',
+  '/themes.css',
+  '/layout.css',
+  '/board.css',
+  '/components.css',
+  '/main.js',
+  '/config.js',
+  '/storage.js',
+  '/board.js',
   '/manifest.json'
 ];
 
