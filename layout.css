@@ -1,0 +1,323 @@
+/* ============================================
+   RITMO MENSUAL - Layout
+   ============================================ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ---------- HEADER ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 10px 16px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 56px;
+  transition: background var(--transition-slow);
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.header-right {
+  justify-content: flex-end;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.brand-icon {
+  font-size: 1.3rem;
+}
+
+.brand-name {
+  display: none;
+}
+
+.current-month {
+  font-size: var(--text-base);
+  font-weight: 600;
+  min-width: 140px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ---------- AREA CHIPS (mobile) ---------- */
+.area-chips {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.area-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.area-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  background: var(--chip-bg);
+  color: var(--text);
+  border: 2px solid transparent;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.area-chip:hover,
+.area-chip.active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, var(--bg));
+}
+
+.area-chip[data-area="cocina"].active { border-color: var(--area-cocina); background: var(--area-cocina-bg); }
+.area-chip[data-area="trabajo"].active { border-color: var(--area-trabajo); background: var(--area-trabajo-bg); }
+.area-chip[data-area="personal"].active { border-color: var(--area-personal); background: var(--area-personal-bg); }
+.area-chip[data-area="compras"].active { border-color: var(--area-compras); background: var(--area-compras-bg); }
+.area-chip[data-area="ahorros"].active { border-color: var(--area-ahorros); background: var(--area-ahorros-bg); }
+.area-chip[data-area="metas"].active { border-color: var(--area-metas); background: var(--area-metas-bg); }
+
+/* ---------- BOARD CONTAINER ---------- */
+.board-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.board {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- USER MENU ---------- */
+.user-menu {
+  position: relative;
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: var(--text-sm);
+  transition: background var(--transition);
+}
+
+.dropdown-item:hover {
+  background: var(--bg-muted);
+}
+
+/* ---------- THEME PANEL ---------- */
+.theme-panel {
+  position: fixed;
+  top: 60px;
+  right: 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  z-index: 90;
+  width: 280px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.theme-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.theme-panel-header h3 {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: all var(--transition);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.theme-option:hover {
+  background: var(--bg-muted);
+}
+
+.theme-option.active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.theme-preview {
+  width: 100%;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  overflow: hidden;
+}
+
+.theme-preview-teal {
+  background: linear-gradient(90deg, #CFF0EA, #88C9C4, #3E9B94, #20666B, #0C3B45);
+}
+.theme-preview-coral {
+  background: linear-gradient(90deg, #F9F5EB, #EA5455, #F07B3F, #2D4059, #002B5B);
+}
+.theme-preview-soft {
+  background: linear-gradient(90deg, #FDE2E4, #FAD2E1, #E2ECE9, #BEE1E6, #DFE7FD);
+}
+.theme-preview-bright {
+  background: linear-gradient(90deg, #FFF3C9, #C9E4A6, #F7B7C4, #A3D9C9, #7FB4E0);
+}
+
+/* ---------- FAB ---------- */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 40%, transparent);
+  z-index: 40;
+  transition: transform var(--transition), background var(--transition);
+}
+
+.fab:hover {
+  transform: scale(1.06);
+  background: var(--primary-hover);
+}
+
+.fab:active {
+  transform: scale(0.96);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (min-width: 768px) {
+  .brand-name {
+    display: inline;
+  }
+
+  .area-chips {
+    display: none;
+  }
+
+  .header {
+    padding: 12px 24px;
+  }
+
+  .current-month {
+    font-size: var(--text-lg);
+    min-width: 180px;
+  }
+
+  .fab {
+    display: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  .board {
+    justify-content: flex-start;
+  }
+}

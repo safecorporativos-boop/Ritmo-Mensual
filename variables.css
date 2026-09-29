@@ -1,0 +1,57 @@
+/* ============================================
+   RITMO MENSUAL - CSS Variables & Area Colors
+   ============================================ */
+
+:root {
+  /* ===== Fixed Area Colors (always recognizable) ===== */
+  --area-cocina: #F07B3F;
+  --area-cocina-bg: color-mix(in srgb, #F07B3F 12%, transparent);
+  --area-trabajo: #002B5B;
+  --area-trabajo-bg: color-mix(in srgb, #002B5B 12%, transparent);
+  --area-personal: #EA5455;
+  --area-personal-bg: color-mix(in srgb, #EA5455 12%, transparent);
+  --area-compras: #A3D9C9;
+  --area-compras-bg: color-mix(in srgb, #A3D9C9 18%, transparent);
+  --area-ahorros: #3E9B94;
+  --area-ahorros-bg: color-mix(in srgb, #3E9B94 14%, transparent);
+  --area-metas: #F7B7C4;
+  --area-metas-bg: color-mix(in srgb, #F7B7C4 18%, transparent);
+
+  /* ===== Priority Colors ===== */
+  --priority-low: #94A3B8;
+  --priority-medium: #F59E0B;
+  --priority-high: #EF4444;
+
+  /* ===== Spacing & Radius ===== */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* ===== Shadows ===== */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+  /* ===== Transitions ===== */
+  --transition: 180ms ease;
+  --transition-slow: 280ms ease;
+
+  /* ===== Typography ===== */
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+
+  /* Column width */
+  --col-width: 300px;
+}

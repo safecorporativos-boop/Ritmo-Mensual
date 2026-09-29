@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#002B5B" />
+  <meta name="description" content="Ritmo Mensual - Organiza tu mes por áreas de forma simple y visual" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  
+  <title>Ritmo Mensual</title>
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/src/css/variables.css" />
+  <link rel="stylesheet" href="/src/css/base.css" />
+  <link rel="stylesheet" href="/src/css/themes.css" />
+  <link rel="stylesheet" href="/src/css/layout.css" />
+  <link rel="stylesheet" href="/src/css/board.css" />
+  <link rel="stylesheet" href="/src/css/components.css" />
+</head>
+<body data-theme="coral">
+  <!-- ========== AUTH SCREEN ========== -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <span class="logo-icon">📅</span>
+        <h1>Ritmo Mensual</h1>
+        <p>Organiza tu mes con claridad</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Iniciar sesión</button>
+        <button class="auth-tab" data-tab="register">Crear cuenta</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form active">
+        <div class="form-group">
+          <label for="login-email">Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="tu@email.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+        <button type="button" class="btn btn-ghost btn-full" id="magic-link-btn">Entrar con Magic Link</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="register-name">Nombre</label>
+          <input type="text" id="register-name" placeholder="Cómo te llamas" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="register-email">Correo electrónico</label>
+          <input type="email" id="register-email" placeholder="tu@email.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Crear cuenta</button>
+      </form>
+
+      <p class="auth-footer">Tus datos están protegidos y solo tú puedes verlos</p>
+    </div>
+  </div>
+
+  <!-- ========== APP SHELL ========== -->
+  <div id="app" class="app hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button id="sidebar-toggle" class="icon-btn" aria-label="Menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="brand">
+          <span class="brand-icon">📅</span>
+          <span class="brand-name">Ritmo Mensual</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <button id="prev-month" class="icon-btn" aria-label="Mes anterior">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 id="current-month" class="current-month">Septiembre 2026</h2>
+        <button id="next-month" class="icon-btn" aria-label="Mes siguiente">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <div class="header-right">
+        <button id="theme-btn" class="icon-btn" aria-label="Cambiar tema" title="Cambiar tema">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+        <button id="export-btn" class="icon-btn" aria-label="Exportar" title="Exportar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <div class="user-menu">
+          <button id="user-btn" class="user-btn">
+            <span id="user-avatar" class="user-avatar">U</span>
+          </button>
+          <div id="user-dropdown" class="dropdown hidden">
+            <div class="dropdown-header">
+              <strong id="user-name">Usuario</strong>
+              <span id="user-email" class="text-muted">email@example.com</span>
+            </div>
+            <button class="dropdown-item" id="logout-btn">Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Theme Selector Panel -->
+    <div id="theme-panel" class="theme-panel hidden">
+      <div class="theme-panel-header">
+        <h3>Elige tu tema</h3>
+        <button id="close-theme" class="icon-btn">✕</button>
+      </div>
+      <div class="theme-options">
+        <button class="theme-option" data-theme="teal">
+          <div class="theme-preview theme-preview-teal"></div>
+          <span>Turquesa</span>
+        </button>
+        <button class="theme-option active" data-theme="coral">
+          <div class="theme-preview theme-preview-coral"></div>
+          <span>Coral Navy</span>
+        </button>
+        <button class="theme-option" data-theme="soft">
+          <div class="theme-preview theme-preview-soft"></div>
+          <span>Pastel Suave</span>
+        </button>
+        <button class="theme-option" data-theme="bright">
+          <div class="theme-preview theme-preview-bright"></div>
+          <span>Pastel Vivo</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Area chips (mobile quick nav) -->
+    <div class="area-chips" id="area-chips">
+      <button class="area-chip" data-area="cocina">Cocina</button>
+      <button class="area-chip" data-area="trabajo">Trabajo</button>
+      <button class="area-chip" data-area="personal">Personal</button>
+      <button class="area-chip" data-area="compras">Compras</button>
+      <button class="area-chip" data-area="ahorros">Ahorros</button>
+      <button class="area-chip" data-area="metas">Metas</button>
+    </div>
+
+    <!-- Main Board -->
+    <main class="board-container">
+      <div class="board" id="board">
+        <!-- Columns will be rendered by JS -->
+      </div>
+    </main>
+
+    <!-- Floating Add Button (mobile) -->
+    <button id="fab-add" class="fab" aria-label="Nueva tarea">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ========== MODAL: Nueva / Editar Tarea ========== -->
+  <div id="task-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Nueva tarea</h3>
+        <button class="icon-btn modal-close" aria-label="Cerrar">✕</button>
+      </div>
+      <form id="task-form">
+        <input type="hidden" id="task-id" />
+        <div class="form-group">
+          <label for="task-title">Título *</label>
+          <input type="text" id="task-title" placeholder="¿Qué necesitas hacer?" required maxlength="120" />
+        </div>
+        <div class="form-group">
+          <label for="task-area">Área</label>
+          <select id="task-area">
+            <option value="cocina">🍳 Cocina</option>
+            <option value="trabajo">💼 Trabajo</option>
+            <option value="personal">👤 Personal</option>
+            <option value="compras">🛒 Compras</option>
+            <option value="ahorros">💰 Ahorros</option>
+            <option value="metas">🎯 Metas / Objetivos</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-priority">Prioridad</label>
+            <select id="task-priority">
+              <option value="low">Baja</option>
+              <option value="medium" selected>Media</option>
+              <option value="high">Alta</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-due">Fecha</label>
+            <input type="date" id="task-due" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="task-notes">Notas</label>
+          <textarea id="task-notes" rows="3" placeholder="Detalles opcionales..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== TOAST ========== -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>

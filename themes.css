@@ -1,0 +1,111 @@
+/* ============================================
+   RITMO MENSUAL - 4 Color Themes
+   ============================================ */
+
+/* ---------- THEME: CORAL NAVY (default) ---------- */
+[data-theme="coral"] {
+  --bg: #F9F5EB;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #F0EBE0;
+  --text: #2D4059;
+  --text-muted: #6B7A90;
+  --text-inverse: #FFFFFF;
+  --border: #E5DFD3;
+  --border-strong: #D0C8B8;
+  --primary: #EA5455;
+  --primary-hover: #D63E3F;
+  --secondary: #002B5B;
+  --secondary-hover: #001F42;
+  --accent: #F07B3F;
+  --header-bg: #FFFFFF;
+  --header-border: #E5DFD3;
+  --card-bg: #FFFFFF;
+  --chip-bg: #F0EBE0;
+  --input-bg: #FFFFFF;
+  --input-border: #D0C8B8;
+  --modal-bg: #FFFFFF;
+  --shadow-color: rgba(45, 64, 89, 0.1);
+  --success: #3E9B94;
+  --danger: #EA5455;
+}
+
+/* ---------- THEME: TEAL ---------- */
+[data-theme="teal"] {
+  --bg: #E8F5F3;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #D4EDE9;
+  --text: #0C3B45;
+  --text-muted: #3E6B73;
+  --text-inverse: #FFFFFF;
+  --border: #B8D9D4;
+  --border-strong: #88C9C4;
+  --primary: #3E9B94;
+  --primary-hover: #2F7F79;
+  --secondary: #20666B;
+  --secondary-hover: #0C3B45;
+  --accent: #88C9C4;
+  --header-bg: #FFFFFF;
+  --header-border: #B8D9D4;
+  --card-bg: #FFFFFF;
+  --chip-bg: #D4EDE9;
+  --input-bg: #FFFFFF;
+  --input-border: #88C9C4;
+  --modal-bg: #FFFFFF;
+  --shadow-color: rgba(12, 59, 69, 0.1);
+  --success: #3E9B94;
+  --danger: #E05A5A;
+}
+
+/* ---------- THEME: PASTEL SOFT ---------- */
+[data-theme="soft"] {
+  --bg: #FDF6F7;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #F5E8EB;
+  --text: #4A3F45;
+  --text-muted: #8A7A82;
+  --text-inverse: #FFFFFF;
+  --border: #E8D5D9;
+  --border-strong: #D4B8C0;
+  --primary: #E89BA8;
+  --primary-hover: #D48492;
+  --secondary: #7BA3B0;
+  --secondary-hover: #5E8794;
+  --accent: #BEE1E6;
+  --header-bg: #FFFFFF;
+  --header-border: #E8D5D9;
+  --card-bg: #FFFFFF;
+  --chip-bg: #F5E8EB;
+  --input-bg: #FFFFFF;
+  --input-border: #D4B8C0;
+  --modal-bg: #FFFFFF;
+  --shadow-color: rgba(74, 63, 69, 0.08);
+  --success: #7BA3B0;
+  --danger: #E89BA8;
+}
+
+/* ---------- THEME: PASTEL BRIGHT ---------- */
+[data-theme="bright"] {
+  --bg: #FFF9EC;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #F5EED8;
+  --text: #2D3A4A;
+  --text-muted: #6B7A8A;
+  --text-inverse: #FFFFFF;
+  --border: #E8DFC8;
+  --border-strong: #D4C8A8;
+  --primary: #7FB4E0;
+  --primary-hover: #5A9AD0;
+  --secondary: #F7B7C4;
+  --secondary-hover: #E89AAB;
+  --accent: #C9E4A6;
+  --header-bg: #FFFFFF;
+  --header-border: #E8DFC8;
+  --card-bg: #FFFFFF;
+  --chip-bg: #F5EED8;
+  --input-bg: #FFFFFF;
+  --input-border: #D4C8A8;
+  --modal-bg: #FFFFFF;
+  --shadow-color: rgba(45, 58, 74, 0.08);
+  --success: #A3D9C9;
+  --danger: #F7B7C4;
+}
