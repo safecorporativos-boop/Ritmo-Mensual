@@ -1,8 +1,2 @@
 [build]
-  publish = "public"
-  # Si más adelante usas Vite u otro bundler, cambia esto
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  publish = "."
