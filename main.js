@@ -1,5 +1,5 @@
 // ============================================
-// RITMO MENSUAL - Main Entry
+// RITMO MENSUAL - Main Entry (versión segura)
 // ============================================
 
 import { THEMES } from './config.js';
@@ -20,21 +20,30 @@ function initTheme() {
   applyTheme(saved);
 }
 
-// ---------- Auth (local mock until Supabase) ----------
+// ---------- Auth ----------
 function showApp(user) {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('user-name').textContent = user.name || 'Usuario';
-  document.getElementById('user-email').textContent = user.email || '';
-  document.getElementById('user-avatar').textContent = (user.name || 'U')[0].toUpperCase();
+  const auth = document.getElementById('auth-screen');
+  const app = document.getElementById('app');
+  if (auth) auth.classList.add('hidden');
+  if (app) app.classList.remove('hidden');
+
+  const nameEl = document.getElementById('user-name');
+  const emailEl = document.getElementById('user-email');
+  const avatarEl = document.getElementById('user-avatar');
+
+  if (nameEl) nameEl.textContent = user.name || 'Usuario';
+  if (emailEl) emailEl.textContent = user.email || '';
+  if (avatarEl) avatarEl.textContent = (user.name || 'U')[0].toUpperCase();
 
   const now = new Date();
   initBoard(now.getFullYear(), now.getMonth());
 }
 
 function showAuth() {
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('app').classList.add('hidden');
+  const auth = document.getElementById('auth-screen');
+  const app = document.getElementById('app');
+  if (auth) auth.classList.remove('hidden');
+  if (app) app.classList.add('hidden');
 }
 
 function initAuth() {
@@ -52,35 +61,49 @@ function initAuth() {
       document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
       tab.classList.add('active');
       const formId = tab.dataset.tab === 'login' ? 'login-form' : 'register-form';
-      document.getElementById(formId).classList.add('active');
+      const form = document.getElementById(formId);
+      if (form) form.classList.add('active');
     });
   });
 
   // Login
-  document.getElementById('login-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-    const user = { name: email.split('@')[0], email };
-    storage.setUser(user);
-    showApp(user);
-    showToast('¡Bienvenido de nuevo!');
-  });
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email')?.value.trim();
+      if (!email) {
+        showToast('Escribe tu correo');
+        return;
+      }
+      const user = { name: email.split('@')[0], email };
+      storage.setUser(user);
+      showApp(user);
+      showToast('¡Bienvenido de nuevo!');
+    });
+  }
 
   // Register
-  document.getElementById('register-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('register-name').value.trim();
-    const email = document.getElementById('register-email').value.trim();
-    const user = { name, email };
-    storage.setUser(user);
-    showApp(user);
-    showToast('Cuenta creada correctamente');
-  });
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('register-name')?.value.trim() || 'Usuario';
+      const email = document.getElementById('register-email')?.value.trim();
+      if (!email) {
+        showToast('Escribe tu correo');
+        return;
+      }
+      const user = { name, email };
+      storage.setUser(user);
+      showApp(user);
+      showToast('Cuenta creada correctamente');
+    });
+  }
 
-  // Magic link mock
+  // Magic link
   document.getElementById('magic-link-btn')?.addEventListener('click', () => {
-    const email = document.getElementById('login-email').value.trim();
+    const email = document.getElementById('login-email')?.value.trim();
     if (!email) {
       showToast('Escribe tu correo primero');
       return;
@@ -92,46 +115,111 @@ function initAuth() {
   });
 
   // Logout
-  document.getElementById('logout-btn').addEventListener('click', () => {
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
     storage.logout();
     showAuth();
-    document.getElementById('user-dropdown').classList.add('hidden');
+    document.getElementById('user-dropdown')?.classList.add('hidden');
   });
 }
 
-// ---------- UI Events ----------
+// ---------- Task Modal ----------
+function openTaskModal({ task = null, area = 'personal' } = {}) {
+  const modal = document.getElementById('task-modal');
+  const form = document.getElementById('task-form');
+  if (!modal || !form) return;
+
+  form.reset();
+  document.getElementById('task-id').value = '';
+
+  if (task) {
+    document.getElementById('modal-title').textContent = 'Editar tarea';
+    document.getElementById('task-id').value = task.id;
+    document.getElementById('task-title').value = task.title;
+    document.getElementById('task-area').value = task.area;
+    document.getElementById('task-priority').value = task.priority;
+    document.getElementById('task-due').value = task.due || '';
+    document.getElementById('task-notes').value = task.notes || '';
+  } else {
+    document.getElementById('modal-title').textContent = 'Nueva tarea';
+    document.getElementById('task-area').value = area;
+  }
+
+  modal.classList.remove('hidden');
+  document.getElementById('task-title')?.focus();
+}
+
+function closeTaskModal() {
+  document.getElementById('task-modal')?.classList.add('hidden');
+}
+
+function initModal() {
+  window.addEventListener('open-task-modal', (e) => {
+    openTaskModal(e.detail || {});
+  });
+
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', closeTaskModal);
+  });
+  document.querySelector('.modal-backdrop')?.addEventListener('click', closeTaskModal);
+
+  document.getElementById('task-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const { year, month } = getCurrentPeriod();
+    const id = document.getElementById('task-id').value;
+    const data = {
+      title: document.getElementById('task-title').value.trim(),
+      area: document.getElementById('task-area').value,
+      priority: document.getElementById('task-priority').value,
+      due: document.getElementById('task-due').value || null,
+      notes: document.getElementById('task-notes').value.trim(),
+    };
+
+    if (!data.title) return;
+
+    if (id) {
+      storage.updateTask(year, month, id, data);
+      showToast('Tarea actualizada');
+    } else {
+      storage.addTask(year, month, data);
+      showToast('Tarea creada');
+    }
+
+    closeTaskModal();
+    const period = getCurrentPeriod();
+    initBoard(period.year, period.month);
+  });
+}
+
+// ---------- UI ----------
 function initUI() {
-  // Month navigation
-  document.getElementById('prev-month').addEventListener('click', () => changeMonth(-1));
-  document.getElementById('next-month').addEventListener('click', () => changeMonth(1));
+  document.getElementById('prev-month')?.addEventListener('click', () => changeMonth(-1));
+  document.getElementById('next-month')?.addEventListener('click', () => changeMonth(1));
 
   // Theme panel
   const themeBtn = document.getElementById('theme-btn');
   const themePanel = document.getElementById('theme-panel');
-  themeBtn.addEventListener('click', () => {
-    themePanel.classList.toggle('hidden');
-  });
-  document.getElementById('close-theme').addEventListener('click', () => {
-    themePanel.classList.add('hidden');
-  });
+  themeBtn?.addEventListener('click', () => themePanel?.classList.toggle('hidden'));
+  document.getElementById('close-theme')?.addEventListener('click', () => themePanel?.classList.add('hidden'));
+
   document.querySelectorAll('.theme-option').forEach(btn => {
     btn.addEventListener('click', () => {
       applyTheme(btn.dataset.theme);
-      themePanel.classList.add('hidden');
-      showToast(`Tema ${btn.querySelector('span').textContent} aplicado`);
+      themePanel?.classList.add('hidden');
+      showToast(`Tema ${btn.querySelector('span')?.textContent || ''} aplicado`);
     });
   });
 
   // User dropdown
-  document.getElementById('user-btn').addEventListener('click', () => {
-    document.getElementById('user-dropdown').classList.toggle('hidden');
+  document.getElementById('user-btn')?.addEventListener('click', () => {
+    document.getElementById('user-dropdown')?.classList.toggle('hidden');
   });
+
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.user-menu')) {
-      document.getElementById('user-dropdown').classList.add('hidden');
+      document.getElementById('user-dropdown')?.classList.add('hidden');
     }
     if (!e.target.closest('#theme-btn') && !e.target.closest('#theme-panel')) {
-      themePanel.classList.add('hidden');
+      themePanel?.classList.add('hidden');
     }
   });
 
@@ -144,34 +232,28 @@ function initUI() {
     });
   });
 
-  // ---------- BOTTOM SHEET DE ÁREAS ----------
+  // Bottom sheet
   const areaSheet = document.getElementById('area-sheet');
 
   function openAreaSheet() {
-    if (areaSheet) areaSheet.classList.remove('hidden');
+    areaSheet?.classList.remove('hidden');
   }
-
   function closeAreaSheet() {
-    if (areaSheet) areaSheet.classList.add('hidden');
+    areaSheet?.classList.add('hidden');
   }
 
-  // Abrir al pulsar el FAB
   document.getElementById('fab-add')?.addEventListener('click', openAreaSheet);
-
-  // Cerrar al tocar el fondo
   document.querySelector('.bottom-sheet-backdrop')?.addEventListener('click', closeAreaSheet);
 
-  // Al elegir un área → abrir modal de nueva tarea
   document.querySelectorAll('.area-card').forEach(card => {
     card.addEventListener('click', () => {
-      const area = card.dataset.area;
       closeAreaSheet();
-      openTaskModal({ area });
+      openTaskModal({ area: card.dataset.area });
     });
   });
 
-  // Exportar
-  document.getElementById('export-btn').addEventListener('click', () => {
+  // Export
+  document.getElementById('export-btn')?.addEventListener('click', () => {
     const { year, month } = getCurrentPeriod();
     const tasks = storage.getTasks(year, month);
     const dataStr = JSON.stringify({ year, month: month + 1, tasks }, null, 2);
@@ -186,17 +268,34 @@ function initUI() {
   });
 }
 
-// ---------- Task Modal ----------
-function openTaskModal({ task = null, area = 'personal' }) {
-  const modal = document.getElementById('task-modal');
-  const form = document.getElementById('task-form');
-  const titleEl = document.getElementById('modal-title');
+// ---------- Toast ----------
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add('hidden'), 2800);
+}
 
-  form.reset();
-  document.getElementById('task-id').value = '';
+// ---------- Service Worker ----------
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+}
 
-  if (task) {
-    titleEl.textContent = 'Editar tarea';
-    document.getElementById('task-id').value = task.id;
-    document.getElementById('task-title').value = task.title;
-    document.getElementById('task-area').value = task.area;
+// ---------- Boot ----------
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    initTheme();
+    initAuth();
+    initUI();
+    initModal();
+    registerSW();
+  } catch (err) {
+    console.error('Error al iniciar la app:', err);
+    alert('Error al cargar la app. Revisa la consola (F12).');
+  }
+});
