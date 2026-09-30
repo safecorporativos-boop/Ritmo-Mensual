@@ -5,14 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#002B5B" />
   <meta name="description" content="Ritmo Mensual - Organiza tu mes por áreas de forma simple y visual" />
+  
+  <!-- PWA / iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Ritmo Mensual" />
+  <meta name="mobile-web-app-capable" content="yes" />
   
   <title>Ritmo Mensual</title>
   
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <!-- Favicon + Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,14 +30,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   
   <!-- Styles -->
- <link rel="stylesheet" href="variables.css" />
-<link rel="stylesheet" href="base.css" />
-<link rel="stylesheet" href="themes.css" />
-<link rel="stylesheet" href="layout.css" />
-<link rel="stylesheet" href="board.css" />
-<link rel="stylesheet" href="components.css" />
+  <link rel="stylesheet" href="variables.css" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="themes.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <link rel="stylesheet" href="board.css" />
+  <link rel="stylesheet" href="components.css" />
 </head>
 <body data-theme="coral">
+
   <!-- ========== AUTH SCREEN ========== -->
   <div id="auth-screen" class="auth-screen">
     <div class="auth-card">
@@ -42,7 +53,6 @@
         <button class="auth-tab" data-tab="register">Crear cuenta</button>
       </div>
 
-      <!-- Login Form -->
       <form id="login-form" class="auth-form active">
         <div class="form-group">
           <label for="login-email">Correo electrónico</label>
@@ -56,7 +66,6 @@
         <button type="button" class="btn btn-ghost btn-full" id="magic-link-btn">Entrar con Magic Link</button>
       </form>
 
-      <!-- Register Form -->
       <form id="register-form" class="auth-form">
         <div class="form-group">
           <label for="register-name">Nombre</label>
@@ -79,7 +88,6 @@
 
   <!-- ========== APP SHELL ========== -->
   <div id="app" class="app hidden">
-    <!-- Header -->
     <header class="header">
       <div class="header-left">
         <button id="sidebar-toggle" class="icon-btn" aria-label="Menú">
@@ -155,7 +163,7 @@
       </div>
     </div>
 
-    <!-- Area chips (mobile quick nav) -->
+    <!-- Area chips (mobile) -->
     <div class="area-chips" id="area-chips">
       <button class="area-chip" data-area="cocina">Cocina</button>
       <button class="area-chip" data-area="trabajo">Trabajo</button>
@@ -167,12 +175,10 @@
 
     <!-- Main Board -->
     <main class="board-container">
-      <div class="board" id="board">
-        <!-- Columns will be rendered by JS -->
-      </div>
+      <div class="board" id="board"></div>
     </main>
 
-    <!-- Floating Add Button (mobile) -->
+    <!-- Floating Add Button -->
     <button id="fab-add" class="fab" aria-label="Nueva tarea">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -231,44 +237,44 @@
     </div>
   </div>
 
-  <!-- ========== TOAST ========== -->
-  <div id="toast" class="toast hidden"></div>
-
-  <!-- Scripts -->
- <script type="module" src="main.js"></script>
-  <!-- Bottom Sheet: Elegir área -->
-<div id="area-sheet" class="bottom-sheet hidden">
-  <div class="bottom-sheet-backdrop"></div>
-  <div class="bottom-sheet-content">
-    <div class="sheet-handle"></div>
-    <h3 class="sheet-title">¿En qué área?</h3>
-    <div class="area-grid">
-      <button class="area-card" data-area="cocina">
-        <span class="area-card-icon">🍳</span>
-        <span class="area-card-label">Cocina</span>
-      </button>
-      <button class="area-card" data-area="trabajo">
-        <span class="area-card-icon">💼</span>
-        <span class="area-card-label">Trabajo</span>
-      </button>
-      <button class="area-card" data-area="personal">
-        <span class="area-card-icon">👤</span>
-        <span class="area-card-label">Personal</span>
-      </button>
-      <button class="area-card" data-area="compras">
-        <span class="area-card-icon">🛒</span>
-        <span class="area-card-label">Compras</span>
-      </button>
-      <button class="area-card" data-area="ahorros">
-        <span class="area-card-icon">💰</span>
-        <span class="area-card-label">Ahorros</span>
-      </button>
-      <button class="area-card" data-area="metas">
-        <span class="area-card-icon">🎯</span>
-        <span class="area-card-label">Metas</span>
-      </button>
+  <!-- ========== BOTTOM SHEET: Elegir área ========== -->
+  <div id="area-sheet" class="bottom-sheet hidden">
+    <div class="bottom-sheet-backdrop"></div>
+    <div class="bottom-sheet-content">
+      <div class="sheet-handle"></div>
+      <h3 class="sheet-title">¿En qué área?</h3>
+      <div class="area-grid">
+        <button class="area-card" data-area="cocina">
+          <span class="area-card-icon">🍳</span>
+          <span class="area-card-label">Cocina</span>
+        </button>
+        <button class="area-card" data-area="trabajo">
+          <span class="area-card-icon">💼</span>
+          <span class="area-card-label">Trabajo</span>
+        </button>
+        <button class="area-card" data-area="personal">
+          <span class="area-card-icon">👤</span>
+          <span class="area-card-label">Personal</span>
+        </button>
+        <button class="area-card" data-area="compras">
+          <span class="area-card-icon">🛒</span>
+          <span class="area-card-label">Compras</span>
+        </button>
+        <button class="area-card" data-area="ahorros">
+          <span class="area-card-icon">💰</span>
+          <span class="area-card-label">Ahorros</span>
+        </button>
+        <button class="area-card" data-area="metas">
+          <span class="area-card-icon">🎯</span>
+          <span class="area-card-label">Metas</span>
+        </button>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="main.js"></script>
 </body>
 </html>
