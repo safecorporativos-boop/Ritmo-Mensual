@@ -236,5 +236,39 @@
 
   <!-- Scripts -->
  <script type="module" src="main.js"></script>
+  <!-- Bottom Sheet: Elegir área -->
+<div id="area-sheet" class="bottom-sheet hidden">
+  <div class="bottom-sheet-backdrop"></div>
+  <div class="bottom-sheet-content">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">¿En qué área?</h3>
+    <div class="area-grid">
+      <button class="area-card" data-area="cocina">
+        <span class="area-card-icon">🍳</span>
+        <span class="area-card-label">Cocina</span>
+      </button>
+      <button class="area-card" data-area="trabajo">
+        <span class="area-card-icon">💼</span>
+        <span class="area-card-label">Trabajo</span>
+      </button>
+      <button class="area-card" data-area="personal">
+        <span class="area-card-icon">👤</span>
+        <span class="area-card-label">Personal</span>
+      </button>
+      <button class="area-card" data-area="compras">
+        <span class="area-card-icon">🛒</span>
+        <span class="area-card-label">Compras</span>
+      </button>
+      <button class="area-card" data-area="ahorros">
+        <span class="area-card-icon">💰</span>
+        <span class="area-card-label">Ahorros</span>
+      </button>
+      <button class="area-card" data-area="metas">
+        <span class="area-card-icon">🎯</span>
+        <span class="area-card-label">Metas</span>
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
