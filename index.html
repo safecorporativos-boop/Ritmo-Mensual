@@ -5,37 +5,256 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#002B5B" />
   <meta name="description" content="Ritmo Mensual - Organiza tu mes por áreas de forma simple y visual" />
-  
-  <!-- PWA / iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Ritmo Mensual" />
   <meta name="mobile-web-app-capable" content="yes" />
-  
+
   <title>Ritmo Mensual</title>
-  
-  <!-- Favicon + Icons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
-  <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-  
-  <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json" />
-  
-  <!-- Fonts -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  
-  <!-- Styles -->
+
   <link rel="stylesheet" href="variables.css" />
   <link rel="stylesheet" href="base.css" />
   <link rel="stylesheet" href="themes.css" />
   <link rel="stylesheet" href="layout.css" />
   <link rel="stylesheet" href="board.css" />
   <link rel="stylesheet" href="components.css" />
+
+  <style>
+    /* ===== HOME: grid de áreas ===== */
+    .home-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px 100px;
+    }
+
+    .home-greeting {
+      margin-bottom: 20px;
+    }
+
+    .home-greeting h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .home-greeting p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .areas-home-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (min-width: 600px) {
+      .areas-home-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .home-area-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 22px 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .home-area-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .home-area-card[data-area="cocina"]::before { background: var(--area-cocina); }
+    .home-area-card[data-area="trabajo"]::before { background: var(--area-trabajo); }
+    .home-area-card[data-area="personal"]::before { background: var(--area-personal); }
+    .home-area-card[data-area="compras"]::before { background: var(--area-compras); }
+    .home-area-card[data-area="ahorros"]::before { background: var(--area-ahorros); }
+    .home-area-card[data-area="metas"]::before { background: var(--area-metas); }
+
+    .home-area-card:active {
+      transform: scale(0.97);
+    }
+
+    .home-area-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .home-area-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .home-area-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: var(--bg-muted);
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+
+    /* ===== AREA DETAIL VIEW ===== */
+    .area-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .area-view-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+    }
+
+    .area-view-header h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .area-view-tasks {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .area-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+    }
+
+    .area-empty span {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .area-view-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--text-inverse);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 40%, transparent);
+      z-index: 40;
+      border: none;
+      cursor: pointer;
+    }
+
+    .area-view-fab:active {
+      transform: scale(0.95);
+    }
+
+    /* Task card in list */
+    .task-list-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+
+    .task-list-card:active {
+      box-shadow: var(--shadow-md);
+    }
+
+    .task-list-card.completed {
+      opacity: 0.6;
+    }
+
+    .task-list-card.completed .task-list-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-list-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .task-list-check {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--border-strong);
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      margin-top: 1px;
+      cursor: pointer;
+    }
+
+    .task-list-card.completed .task-list-check {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .task-list-title {
+      font-weight: 500;
+      font-size: 0.95rem;
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .task-list-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      margin-left: 34px;
+    }
+
+    /* Hide old board when using new views */
+    .board-container { display: none !important; }
+    .area-chips { display: none !important; }
+
+    .view-hidden { display: none !important; }
+  </style>
 </head>
 <body data-theme="coral">
 
@@ -90,9 +309,9 @@
   <div id="app" class="app hidden">
     <header class="header">
       <div class="header-left">
-        <button id="sidebar-toggle" class="icon-btn" aria-label="Menú">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        <button id="back-btn" class="icon-btn view-hidden" aria-label="Volver">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6"/>
           </svg>
         </button>
         <div class="brand">
@@ -137,7 +356,7 @@
       </div>
     </header>
 
-    <!-- Theme Selector Panel -->
+    <!-- Theme panel -->
     <div id="theme-panel" class="theme-panel hidden">
       <div class="theme-panel-header">
         <h3>Elige tu tema</h3>
@@ -163,22 +382,35 @@
       </div>
     </div>
 
-    <!-- Area chips (mobile) -->
-    <div class="area-chips" id="area-chips">
-      <button class="area-chip" data-area="cocina">Cocina</button>
-      <button class="area-chip" data-area="trabajo">Trabajo</button>
-      <button class="area-chip" data-area="personal">Personal</button>
-      <button class="area-chip" data-area="compras">Compras</button>
-      <button class="area-chip" data-area="ahorros">Ahorros</button>
-      <button class="area-chip" data-area="metas">Metas</button>
+    <!-- ===== HOME VIEW: grid de áreas ===== -->
+    <div id="home-view" class="home-view">
+      <div class="home-greeting">
+        <h2 id="greeting-text">Hola</h2>
+        <p>Elige un área para organizar tu mes</p>
+      </div>
+      <div class="areas-home-grid" id="areas-home-grid">
+        <!-- Se llena con JS -->
+      </div>
     </div>
 
-    <!-- Main Board -->
-    <main class="board-container">
-      <div class="board" id="board"></div>
-    </main>
+    <!-- ===== AREA DETAIL VIEW ===== -->
+    <div id="area-view" class="area-view view-hidden">
+      <div class="area-view-header">
+        <span id="area-view-icon" style="font-size:1.4rem"></span>
+        <h2 id="area-view-title">Área</h2>
+        <span id="area-view-count" class="column-count">0</span>
+      </div>
+      <div class="area-view-tasks" id="area-view-tasks">
+        <!-- Tareas de esta área -->
+      </div>
+      <button id="area-fab" class="area-view-fab" aria-label="Nueva tarea">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
 
-    <!-- Floating Add Button -->
+    <!-- FAB global (home) -->
     <button id="fab-add" class="fab" aria-label="Nueva tarea">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -272,7 +504,6 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
   <script type="module" src="main.js"></script>

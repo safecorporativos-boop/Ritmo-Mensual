@@ -1,10 +1,37 @@
 // ============================================
-// RITMO MENSUAL - Main Entry (versión segura)
+// RITMO MENSUAL - Main Entry (Home + Area views)
 // ============================================
 
-import { THEMES } from './config.js';
+import { AREAS, PRIORITIES, MONTHS_ES } from './config.js';
 import * as storage from './storage.js';
-import { initBoard, changeMonth, getCurrentPeriod, scrollToArea } from './board.js';
+
+let currentYear, currentMonth;
+let currentAreaId = null;
+
+// ---------- Helpers ----------
+function getPeriod() {
+  return { year: currentYear, month: currentMonth };
+}
+
+function updateMonthLabel() {
+  const el = document.getElementById('current-month');
+  if (el) el.textContent = `${MONTHS_ES[currentMonth]} ${currentYear}`;
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => el.classList.add('hidden'), 2800);
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
 
 // ---------- Theme ----------
 function applyTheme(theme) {
@@ -15,115 +42,137 @@ function applyTheme(theme) {
   });
 }
 
-function initTheme() {
-  const saved = storage.getTheme();
-  applyTheme(saved);
+// ---------- Navigation ----------
+function showHome() {
+  currentAreaId = null;
+  document.getElementById('home-view')?.classList.remove('view-hidden');
+  document.getElementById('area-view')?.classList.add('view-hidden');
+  document.getElementById('back-btn')?.classList.add('view-hidden');
+  document.getElementById('fab-add')?.classList.remove('view-hidden');
+  renderHome();
 }
 
-// ---------- Auth ----------
-function showApp(user) {
-  const auth = document.getElementById('auth-screen');
-  const app = document.getElementById('app');
-  if (auth) auth.classList.add('hidden');
-  if (app) app.classList.remove('hidden');
+function showArea(areaId) {
+  currentAreaId = areaId;
+  const area = AREAS.find(a => a.id === areaId);
+  if (!area) return;
 
-  const nameEl = document.getElementById('user-name');
-  const emailEl = document.getElementById('user-email');
-  const avatarEl = document.getElementById('user-avatar');
+  document.getElementById('home-view')?.classList.add('view-hidden');
+  document.getElementById('area-view')?.classList.remove('view-hidden');
+  document.getElementById('back-btn')?.classList.remove('view-hidden');
+  document.getElementById('fab-add')?.classList.add('view-hidden');
 
-  if (nameEl) nameEl.textContent = user.name || 'Usuario';
-  if (emailEl) emailEl.textContent = user.email || '';
-  if (avatarEl) avatarEl.textContent = (user.name || 'U')[0].toUpperCase();
+  document.getElementById('area-view-icon').textContent = area.emoji;
+  document.getElementById('area-view-title').textContent = area.name;
 
-  const now = new Date();
-  initBoard(now.getFullYear(), now.getMonth());
+  renderAreaTasks();
 }
 
-function showAuth() {
-  const auth = document.getElementById('auth-screen');
-  const app = document.getElementById('app');
-  if (auth) auth.classList.remove('hidden');
-  if (app) app.classList.add('hidden');
+// ---------- Render Home ----------
+function renderHome() {
+  const grid = document.getElementById('areas-home-grid');
+  if (!grid) return;
+
+  const tasks = storage.getTasks(currentYear, currentMonth);
+
+  grid.innerHTML = AREAS.map(area => {
+    const count = tasks.filter(t => t.area === area.id).length;
+    const done = tasks.filter(t => t.area === area.id && t.completed).length;
+    const label = count === 0 ? 'Sin tareas' : `${done}/${count} completadas`;
+
+    return `
+      <button class="home-area-card" data-area="${area.id}">
+        <span class="home-area-icon">${area.emoji}</span>
+        <span class="home-area-name">${area.name}</span>
+        <span class="home-area-count">${label}</span>
+      </button>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.home-area-card').forEach(card => {
+    card.addEventListener('click', () => showArea(card.dataset.area));
+  });
 }
 
-function initAuth() {
-  const user = storage.getUser();
-  if (user) {
-    showApp(user);
-  } else {
-    showAuth();
+// ---------- Render Area Tasks ----------
+function renderAreaTasks() {
+  const container = document.getElementById('area-view-tasks');
+  const countEl = document.getElementById('area-view-count');
+  if (!container || !currentAreaId) return;
+
+  const tasks = storage.getTasks(currentYear, currentMonth)
+    .filter(t => t.area === currentAreaId)
+    .sort((a, b) => (a.completed === b.completed ? 0 : a.completed ? 1 : -1));
+
+  if (countEl) countEl.textContent = tasks.length;
+
+  if (tasks.length === 0) {
+    const area = AREAS.find(a => a.id === currentAreaId);
+    container.innerHTML = `
+      <div class="area-empty">
+        <span>${area?.emoji || '📋'}</span>
+        <p>No hay tareas en esta área</p>
+        <p style="font-size:0.85rem;margin-top:6px">Pulsa el botón + para crear una</p>
+      </div>
+    `;
+    return;
   }
 
-  // Tabs
-  document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-      tab.classList.add('active');
-      const formId = tab.dataset.tab === 'login' ? 'login-form' : 'register-form';
-      const form = document.getElementById(formId);
-      if (form) form.classList.add('active');
+  container.innerHTML = tasks.map(task => {
+    const dueStr = task.due
+      ? new Date(task.due + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short' })
+      : '';
+    const isOverdue = task.due && !task.completed && new Date(task.due) < new Date().setHours(0, 0, 0, 0);
+    const pri = PRIORITIES[task.priority] || PRIORITIES.medium;
+
+    return `
+      <div class="task-list-card ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+        <div class="task-list-row">
+          <div class="task-list-check" data-id="${task.id}">${task.completed ? '✓' : ''}</div>
+          <div class="task-list-title">${escapeHtml(task.title)}</div>
+        </div>
+        ${task.notes ? `<div class="task-notes-preview" style="margin-left:34px;margin-top:4px">${escapeHtml(task.notes)}</div>` : ''}
+        <div class="task-list-meta">
+          <span class="task-priority ${task.priority}">${pri.label}</span>
+          ${dueStr ? `<span class="task-due ${isOverdue ? 'overdue' : ''}">📅 ${dueStr}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Checkbox toggle
+  container.querySelectorAll('.task-list-check').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      storage.toggleTask(currentYear, currentMonth, el.dataset.id);
+      renderAreaTasks();
+      renderHome();
     });
   });
 
-  // Login
-  const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email')?.value.trim();
-      if (!email) {
-        showToast('Escribe tu correo');
-        return;
-      }
-      const user = { name: email.split('@')[0], email };
-      storage.setUser(user);
-      showApp(user);
-      showToast('¡Bienvenido de nuevo!');
+  // Open edit
+  container.querySelectorAll('.task-list-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.task-list-check')) return;
+      const tasks = storage.getTasks(currentYear, currentMonth);
+      const task = tasks.find(t => t.id === card.dataset.id);
+      if (task) openTaskModal({ task });
     });
-  }
-
-  // Register
-  const registerForm = document.getElementById('register-form');
-  if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('register-name')?.value.trim() || 'Usuario';
-      const email = document.getElementById('register-email')?.value.trim();
-      if (!email) {
-        showToast('Escribe tu correo');
-        return;
-      }
-      const user = { name, email };
-      storage.setUser(user);
-      showApp(user);
-      showToast('Cuenta creada correctamente');
-    });
-  }
-
-  // Magic link
-  document.getElementById('magic-link-btn')?.addEventListener('click', () => {
-    const email = document.getElementById('login-email')?.value.trim();
-    if (!email) {
-      showToast('Escribe tu correo primero');
-      return;
-    }
-    const user = { name: email.split('@')[0], email };
-    storage.setUser(user);
-    showApp(user);
-    showToast('Magic Link simulado ✓');
   });
+}
 
-  // Logout
-  document.getElementById('logout-btn')?.addEventListener('click', () => {
-    storage.logout();
-    showAuth();
-    document.getElementById('user-dropdown')?.classList.add('hidden');
-  });
+// ---------- Month change ----------
+function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  updateMonthLabel();
+  if (currentAreaId) renderAreaTasks();
+  else renderHome();
 }
 
 // ---------- Task Modal ----------
-function openTaskModal({ task = null, area = 'personal' } = {}) {
+function openTaskModal({ task = null, area = null } = {}) {
   const modal = document.getElementById('task-modal');
   const form = document.getElementById('task-form');
   if (!modal || !form) return;
@@ -141,7 +190,7 @@ function openTaskModal({ task = null, area = 'personal' } = {}) {
     document.getElementById('task-notes').value = task.notes || '';
   } else {
     document.getElementById('modal-title').textContent = 'Nueva tarea';
-    document.getElementById('task-area').value = area;
+    document.getElementById('task-area').value = area || currentAreaId || 'personal';
   }
 
   modal.classList.remove('hidden');
@@ -152,55 +201,98 @@ function closeTaskModal() {
   document.getElementById('task-modal')?.classList.add('hidden');
 }
 
-function initModal() {
-  window.addEventListener('open-task-modal', (e) => {
-    openTaskModal(e.detail || {});
-  });
+// ---------- Auth ----------
+function showApp(user) {
+  document.getElementById('auth-screen')?.classList.add('hidden');
+  document.getElementById('app')?.classList.remove('hidden');
+  document.getElementById('user-name').textContent = user.name || 'Usuario';
+  document.getElementById('user-email').textContent = user.email || '';
+  document.getElementById('user-avatar').textContent = (user.name || 'U')[0].toUpperCase();
+  document.getElementById('greeting-text').textContent = `Hola, ${user.name || 'Usuario'}`;
 
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', closeTaskModal);
-  });
-  document.querySelector('.modal-backdrop')?.addEventListener('click', closeTaskModal);
-
-  document.getElementById('task-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const { year, month } = getCurrentPeriod();
-    const id = document.getElementById('task-id').value;
-    const data = {
-      title: document.getElementById('task-title').value.trim(),
-      area: document.getElementById('task-area').value,
-      priority: document.getElementById('task-priority').value,
-      due: document.getElementById('task-due').value || null,
-      notes: document.getElementById('task-notes').value.trim(),
-    };
-
-    if (!data.title) return;
-
-    if (id) {
-      storage.updateTask(year, month, id, data);
-      showToast('Tarea actualizada');
-    } else {
-      storage.addTask(year, month, data);
-      showToast('Tarea creada');
-    }
-
-    closeTaskModal();
-    const period = getCurrentPeriod();
-    initBoard(period.year, period.month);
-  });
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth();
+  updateMonthLabel();
+  showHome();
 }
 
-// ---------- UI ----------
-function initUI() {
+function showAuth() {
+  document.getElementById('auth-screen')?.classList.remove('hidden');
+  document.getElementById('app')?.classList.add('hidden');
+}
+
+// ---------- Init ----------
+document.addEventListener('DOMContentLoaded', () => {
+  // Theme
+  applyTheme(storage.getTheme());
+
+  // Auth state
+  const user = storage.getUser();
+  if (user) showApp(user);
+  else showAuth();
+
+  // Auth tabs
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab === 'login' ? 'login-form' : 'register-form')?.classList.add('active');
+    });
+  });
+
+  // Login
+  document.getElementById('login-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email')?.value.trim();
+    if (!email) return showToast('Escribe tu correo');
+    const u = { name: email.split('@')[0], email };
+    storage.setUser(u);
+    showApp(u);
+    showToast('¡Bienvenido de nuevo!');
+  });
+
+  // Register
+  document.getElementById('register-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('register-name')?.value.trim() || 'Usuario';
+    const email = document.getElementById('register-email')?.value.trim();
+    if (!email) return showToast('Escribe tu correo');
+    const u = { name, email };
+    storage.setUser(u);
+    showApp(u);
+    showToast('Cuenta creada correctamente');
+  });
+
+  // Magic link
+  document.getElementById('magic-link-btn')?.addEventListener('click', () => {
+    const email = document.getElementById('login-email')?.value.trim();
+    if (!email) return showToast('Escribe tu correo primero');
+    const u = { name: email.split('@')[0], email };
+    storage.setUser(u);
+    showApp(u);
+    showToast('Magic Link simulado ✓');
+  });
+
+  // Logout
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    storage.logout();
+    showAuth();
+    document.getElementById('user-dropdown')?.classList.add('hidden');
+  });
+
+  // Month nav
   document.getElementById('prev-month')?.addEventListener('click', () => changeMonth(-1));
   document.getElementById('next-month')?.addEventListener('click', () => changeMonth(1));
 
-  // Theme panel
-  const themeBtn = document.getElementById('theme-btn');
-  const themePanel = document.getElementById('theme-panel');
-  themeBtn?.addEventListener('click', () => themePanel?.classList.toggle('hidden'));
-  document.getElementById('close-theme')?.addEventListener('click', () => themePanel?.classList.add('hidden'));
+  // Back button
+  document.getElementById('back-btn')?.addEventListener('click', showHome);
 
+  // Theme panel
+  const themePanel = document.getElementById('theme-panel');
+  document.getElementById('theme-btn')?.addEventListener('click', () => themePanel?.classList.toggle('hidden'));
+  document.getElementById('close-theme')?.addEventListener('click', () => themePanel?.classList.add('hidden'));
   document.querySelectorAll('.theme-option').forEach(btn => {
     btn.addEventListener('click', () => {
       applyTheme(btn.dataset.theme);
@@ -213,7 +305,6 @@ function initUI() {
   document.getElementById('user-btn')?.addEventListener('click', () => {
     document.getElementById('user-dropdown')?.classList.toggle('hidden');
   });
-
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.user-menu')) {
       document.getElementById('user-dropdown')?.classList.add('hidden');
@@ -223,79 +314,81 @@ function initUI() {
     }
   });
 
-  // Area chips
-  document.querySelectorAll('.area-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.area-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      scrollToArea(chip.dataset.area);
+  // Bottom sheet
+  const areaSheet = document.getElementById('area-sheet');
+  function openSheet() { areaSheet?.classList.remove('hidden'); }
+  function closeSheet() { areaSheet?.classList.add('hidden'); }
+
+  document.getElementById('fab-add')?.addEventListener('click', openSheet);
+  document.querySelector('.bottom-sheet-backdrop')?.addEventListener('click', closeSheet);
+
+  // From sheet → go to that area (or open modal if already inside an area)
+  document.querySelectorAll('.area-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const area = card.dataset.area;
+      closeSheet();
+      showArea(area);
     });
   });
 
-  // Bottom sheet
-  const areaSheet = document.getElementById('area-sheet');
+  // FAB inside area → new task for current area
+  document.getElementById('area-fab')?.addEventListener('click', () => {
+    openTaskModal({ area: currentAreaId });
+  });
 
-  function openAreaSheet() {
-    areaSheet?.classList.remove('hidden');
-  }
-  function closeAreaSheet() {
-    areaSheet?.classList.add('hidden');
-  }
+  // Modal close
+  document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeTaskModal));
+  document.querySelector('.modal-backdrop')?.addEventListener('click', closeTaskModal);
 
-  document.getElementById('fab-add')?.addEventListener('click', openAreaSheet);
-  document.querySelector('.bottom-sheet-backdrop')?.addEventListener('click', closeAreaSheet);
+  // Modal submit
+  document.getElementById('task-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('task-id').value;
+    const data = {
+      title: document.getElementById('task-title').value.trim(),
+      area: document.getElementById('task-area').value,
+      priority: document.getElementById('task-priority').value,
+      due: document.getElementById('task-due').value || null,
+      notes: document.getElementById('task-notes').value.trim(),
+    };
+    if (!data.title) return;
 
-  document.querySelectorAll('.area-card').forEach(card => {
-    card.addEventListener('click', () => {
-      closeAreaSheet();
-      openTaskModal({ area: card.dataset.area });
-    });
+    if (id) {
+      storage.updateTask(currentYear, currentMonth, id, data);
+      showToast('Tarea actualizada');
+    } else {
+      storage.addTask(currentYear, currentMonth, data);
+      showToast('Tarea creada');
+    }
+
+    closeTaskModal();
+
+    // Refresh current view
+    if (currentAreaId) {
+      // If task was created in another area, go there
+      if (data.area !== currentAreaId) showArea(data.area);
+      else renderAreaTasks();
+    } else {
+      renderHome();
+    }
   });
 
   // Export
   document.getElementById('export-btn')?.addEventListener('click', () => {
-    const { year, month } = getCurrentPeriod();
-    const tasks = storage.getTasks(year, month);
-    const dataStr = JSON.stringify({ year, month: month + 1, tasks }, null, 2);
+    const tasks = storage.getTasks(currentYear, currentMonth);
+    const dataStr = JSON.stringify({ year: currentYear, month: currentMonth + 1, tasks }, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ritmo-mensual-${year}-${String(month + 1).padStart(2, '0')}.json`;
+    a.download = `ritmo-mensual-${currentYear}-${String(currentMonth + 1).padStart(2, '0')}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('Mes exportado en JSON');
   });
-}
 
-// ---------- Toast ----------
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add('hidden'), 2800);
-}
-
-// ---------- Service Worker ----------
-function registerSW() {
+  // Service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
-}
-
-// ---------- Boot ----------
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    initTheme();
-    initAuth();
-    initUI();
-    initModal();
-    registerSW();
-  } catch (err) {
-    console.error('Error al iniciar la app:', err);
-    alert('Error al cargar la app. Revisa la consola (F12).');
   }
 });
