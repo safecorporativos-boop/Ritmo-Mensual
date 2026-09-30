@@ -61,7 +61,6 @@ function initAuth() {
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    // Mock login
     const user = { name: email.split('@')[0], email };
     storage.setUser(user);
     showApp(user);
@@ -145,12 +144,33 @@ function initUI() {
     });
   });
 
-  // FAB
-  document.getElementById('fab-add').addEventListener('click', () => {
-    openTaskModal({});
+  // ---------- BOTTOM SHEET DE ÁREAS ----------
+  const areaSheet = document.getElementById('area-sheet');
+
+  function openAreaSheet() {
+    if (areaSheet) areaSheet.classList.remove('hidden');
+  }
+
+  function closeAreaSheet() {
+    if (areaSheet) areaSheet.classList.add('hidden');
+  }
+
+  // Abrir al pulsar el FAB
+  document.getElementById('fab-add')?.addEventListener('click', openAreaSheet);
+
+  // Cerrar al tocar el fondo
+  document.querySelector('.bottom-sheet-backdrop')?.addEventListener('click', closeAreaSheet);
+
+  // Al elegir un área → abrir modal de nueva tarea
+  document.querySelectorAll('.area-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const area = card.dataset.area;
+      closeAreaSheet();
+      openTaskModal({ area });
+    });
   });
 
-  // Export (placeholder)
+  // Exportar
   document.getElementById('export-btn').addEventListener('click', () => {
     const { year, month } = getCurrentPeriod();
     const tasks = storage.getTasks(year, month);
@@ -180,83 +200,3 @@ function openTaskModal({ task = null, area = 'personal' }) {
     document.getElementById('task-id').value = task.id;
     document.getElementById('task-title').value = task.title;
     document.getElementById('task-area').value = task.area;
-    document.getElementById('task-priority').value = task.priority;
-    document.getElementById('task-due').value = task.due || '';
-    document.getElementById('task-notes').value = task.notes || '';
-  } else {
-    titleEl.textContent = 'Nueva tarea';
-    document.getElementById('task-area').value = area;
-  }
-
-  modal.classList.remove('hidden');
-  document.getElementById('task-title').focus();
-}
-
-function closeTaskModal() {
-  document.getElementById('task-modal').classList.add('hidden');
-}
-
-function initModal() {
-  window.addEventListener('open-task-modal', (e) => {
-    openTaskModal(e.detail || {});
-  });
-
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', closeTaskModal);
-  });
-  document.querySelector('.modal-backdrop')?.addEventListener('click', closeTaskModal);
-
-  document.getElementById('task-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const { year, month } = getCurrentPeriod();
-    const id = document.getElementById('task-id').value;
-    const data = {
-      title: document.getElementById('task-title').value.trim(),
-      area: document.getElementById('task-area').value,
-      priority: document.getElementById('task-priority').value,
-      due: document.getElementById('task-due').value || null,
-      notes: document.getElementById('task-notes').value.trim(),
-    };
-
-    if (!data.title) return;
-
-    if (id) {
-      storage.updateTask(year, month, id, data);
-      showToast('Tarea actualizada');
-    } else {
-      storage.addTask(year, month, data);
-      showToast('Tarea creada');
-    }
-
-    closeTaskModal();
-    // Re-render
-    const period = getCurrentPeriod();
-    initBoard(period.year, period.month);
-  });
-}
-
-// ---------- Toast ----------
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add('hidden'), 2800);
-}
-
-// ---------- Service Worker (PWA) ----------
-function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
-}
-
-// ---------- Boot ----------
-document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
-  initAuth();
-  initUI();
-  initModal();
-  registerSW();
-});
