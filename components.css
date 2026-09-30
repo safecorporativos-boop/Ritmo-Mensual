@@ -354,3 +354,95 @@
 .area-card[data-area="compras"]:hover  { border-color: var(--area-compras); }
 .area-card[data-area="ahorros"]:hover  { border-color: var(--area-ahorros); }
 .area-card[data-area="metas"]:hover    { border-color: var(--area-metas); }
+/* ========== BOTTOM SHEET ========== */
+.bottom-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bottom-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+}
+
+.bottom-sheet-content {
+  position: relative;
+  background: var(--bg-elevated);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: 12px 20px 32px;
+  animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-strong);
+  border-radius: 99px;
+  margin: 0 auto 16px;
+}
+
+.sheet-title {
+  text-align: center;
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+
+.area-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.area-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 8px;
+  background: var(--bg-muted);
+  border-radius: 16px;
+  border: 2px solid transparent;
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+
+.area-card:hover,
+.area-card:active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-muted));
+  transform: scale(0.97);
+}
+
+.area-card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.area-card-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.area-card[data-area="cocina"]:hover   { border-color: var(--area-cocina); }
+.area-card[data-area="trabajo"]:hover  { border-color: var(--area-trabajo); }
+.area-card[data-area="personal"]:hover { border-color: var(--area-personal); }
+.area-card[data-area="compras"]:hover  { border-color: var(--area-compras); }
+.area-card[data-area="ahorros"]:hover  { border-color: var(--area-ahorros); }
+.area-card[data-area="metas"]:hover    { border-color: var(--area-metas); }
